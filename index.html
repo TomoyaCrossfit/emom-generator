@@ -64,7 +64,25 @@
     font-family: 'DM Mono', monospace;
     margin-bottom: 8px;
     letter-spacing: 1px;
+    text-transform: uppercase;
   }
+
+  /* Pattern display */
+  .pattern-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    margin-left: 14px;
+    vertical-align: middle;
+  }
+  .pattern-sub-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 12px;
+  }
+  @media (max-width: 480px) { .pattern-sub-grid { grid-template-columns: 1fr; } }
 
   /* Chips */
   .chip-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -168,12 +186,13 @@
   .workout-body { padding: 20px 24px; }
   .emom-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 18px; }
 
-  /* 4-movement layout */
+  /* movement layout */
   .movements-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
   @media (max-width: 560px) { .movements-grid { grid-template-columns: 1fr; } }
   .movement-block {
     background: var(--surface);
     border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
     padding: 14px 16px;
     position: relative;
     overflow: hidden;
@@ -188,25 +207,16 @@
     line-height: 1;
     pointer-events: none;
   }
-  .movement-block.mv-a { border-left: 3px solid var(--accent); }
-  .movement-block.mv-b { border-left: 3px solid var(--accent2); }
-  .movement-block.mv-c { border-left: 3px solid #00cfff; }
-  .movement-block.mv-d { border-left: 3px solid #bf7fff; }
   .mv-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .mv-letter {
-    font-family: 'Bebas Neue', sans-serif; font-size: 22px; line-height: 1;
-  }
-  .mv-a .mv-letter { color: var(--accent); }
-  .mv-b .mv-letter { color: var(--accent2); }
-  .mv-c .mv-letter { color: #00cfff; }
-  .mv-d .mv-letter { color: #bf7fff; }
+  .mv-letter { font-family: 'Bebas Neue', sans-serif; font-size: 22px; line-height: 1; }
   .mv-mins { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; margin-left: auto; }
   .mv-content { font-size: 14px; color: var(--text); line-height: 1.5; font-weight: 500; }
 
-  /* 12-min rotation bar */
-  .rotation-bar { display: flex; gap: 3px; margin-top: 16px; margin-bottom: 16px; }
+  /* rotation bar */
+  .rotation-bar { display: flex; gap: 3px; margin-top: 16px; margin-bottom: 16px; flex-wrap: wrap; }
   .rot-block {
     flex: 1;
+    min-width: 20px;
     height: 28px;
     display: flex;
     align-items: center;
@@ -215,10 +225,6 @@
     font-size: 13px;
     letter-spacing: 0.5px;
   }
-  .rot-a { background: rgba(232,255,0,0.12); color: var(--accent); border-top: 2px solid var(--accent); }
-  .rot-b { background: rgba(255,77,0,0.12); color: var(--accent2); border-top: 2px solid var(--accent2); }
-  .rot-c { background: rgba(0,207,255,0.1); color: #00cfff; border-top: 2px solid #00cfff; }
-  .rot-d { background: rgba(191,127,255,0.1); color: #bf7fff; border-top: 2px solid #bf7fff; }
   .rot-label { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--muted); letter-spacing: 1px; margin-bottom: 4px; }
 
   .workout-notes { padding: 12px 16px; background: var(--surface); border-left: 2px solid var(--muted); font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 4px; }
@@ -232,7 +238,7 @@
 <header>
   <div>
     <div class="logo">EMOM<span>GEN</span></div>
-    <div class="subtitle">CrossFit 4×3 EMOM Generator — Powered by Claude</div>
+    <div class="subtitle">CrossFit EMOM Generator — Powered by Claude</div>
   </div>
 </header>
 
@@ -261,6 +267,33 @@
           <button class="chip active" data-group="level" data-val="Intermediate">中級</button>
           <button class="chip" data-group="level" data-val="Advanced">上級</button>
           <button class="chip" data-group="level" data-val="RX">RX+</button>
+        </div>
+      </div>
+
+      <!-- EMOM Pattern -->
+      <div class="form-group full-width">
+        <label>EMOMパターン <span id="pattern-display" class="pattern-display">4 × 3 = 12分</span></label>
+        <div class="pattern-sub-grid">
+          <div>
+            <div class="sublabel">動作数 (Movements)</div>
+            <div class="chip-group">
+              <button class="chip" data-group="numMovements" data-val="2">2</button>
+              <button class="chip" data-group="numMovements" data-val="3">3</button>
+              <button class="chip active" data-group="numMovements" data-val="4">4</button>
+              <button class="chip" data-group="numMovements" data-val="5">5</button>
+              <button class="chip" data-group="numMovements" data-val="6">6</button>
+            </div>
+          </div>
+          <div>
+            <div class="sublabel">ラウンド数 (Rounds)</div>
+            <div class="chip-group">
+              <button class="chip" data-group="numRounds" data-val="2">2</button>
+              <button class="chip active" data-group="numRounds" data-val="3">3</button>
+              <button class="chip" data-group="numRounds" data-val="4">4</button>
+              <button class="chip" data-group="numRounds" data-val="5">5</button>
+              <button class="chip" data-group="numRounds" data-val="6">6</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -364,12 +397,24 @@
 </div>
 
 <script>
-const selections = { target: [], level: ['Intermediate'], equipment: ['Barbell', 'Dumbbells'], movements: [] };
+const selections = {
+  target: [],
+  level: ['Intermediate'],
+  equipment: ['Barbell', 'Dumbbells'],
+  movements: [],
+  numMovements: [4],
+  numRounds: [3]
+};
 let workouts = [];
+
+// 6-color palette for up to 6 movements
+const MV_COLORS = ['#e8ff00', '#ff4d00', '#00cfff', '#bf7fff', '#00ff88', '#ff88cc'];
+const MV_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 window.addEventListener('load', () => {
   const ak = localStorage.getItem('emom_anthropic_key');
   if (ak) document.getElementById('anthropic-key').value = ak;
+  updatePatternUI();
 });
 
 // Chip toggle
@@ -377,13 +422,14 @@ document.querySelectorAll('.chip').forEach(chip => {
   chip.addEventListener('click', () => {
     const group = chip.dataset.group;
     const val = chip.dataset.val;
-    const single = group === 'level';
+    const single = group === 'level' || group === 'numMovements' || group === 'numRounds';
     const isMove = group === 'movements';
 
     if (single) {
       document.querySelectorAll(`[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
-      selections[group] = [val];
+      selections[group] = [isNaN(val) ? val : Number(val)];
       chip.classList.add('active');
+      if (group === 'numMovements' || group === 'numRounds') updatePatternUI();
     } else {
       const activeClass = isMove ? 'active-move' : 'active';
       if (chip.classList.contains('active') || chip.classList.contains('active-move')) {
@@ -397,6 +443,14 @@ document.querySelectorAll('.chip').forEach(chip => {
   });
 });
 
+function updatePatternUI() {
+  const N = Number(selections.numMovements[0]);
+  const R = Number(selections.numRounds[0]);
+  const total = N * R;
+  document.getElementById('pattern-display').textContent = `${N} × ${R} = ${total}分`;
+  document.getElementById('gen-btn').textContent = `⚡ ${N}×${R} EMOM ワークアウトを生成する`;
+}
+
 async function generate() {
   const anthropicKey = document.getElementById('anthropic-key').value.trim();
   if (!anthropicKey) {
@@ -404,6 +458,11 @@ async function generate() {
     return;
   }
   localStorage.setItem('emom_anthropic_key', anthropicKey);
+
+  const N = Number(selections.numMovements[0]);
+  const R = Number(selections.numRounds[0]);
+  const totalMins = N * R;
+  const letters = MV_LETTERS.slice(0, N);
 
   const btn = document.getElementById('gen-btn');
   const loading = document.getElementById('loading');
@@ -420,14 +479,21 @@ async function generate() {
   const target = selections.target.length ? selections.target.join(', ') : 'Full Body';
   const notes = document.getElementById('extra-notes').value || 'None';
 
-  const prompt = `You are an expert CrossFit programmer. Generate exactly 3 distinct 12-minute EMOM workouts.
+  // Build dynamic minute assignment description
+  const structureLines = letters.map((letter, i) => {
+    const mins = [];
+    for (let r = 0; r < R; r++) mins.push(r * N + i + 1);
+    return `- Movement ${letter} → minutes ${mins.join(', ')}`;
+  }).join('\n');
+
+  // Build example JSON movements array
+  const exampleMovements = letters.map(l => `{"label": "${l}", "content": "specific reps + movement + weight/scale"}`).join(',\n        ');
+
+  const prompt = `You are an expert CrossFit programmer. Generate exactly 3 distinct ${totalMins}-minute EMOM workouts.
 
 STRUCTURE (mandatory):
-Each workout has exactly 4 movements (A, B, C, D) that rotate 3 times:
-- Movement A → minutes 1, 5, 9
-- Movement B → minutes 2, 6, 10
-- Movement C → minutes 3, 7, 11
-- Movement D → minutes 4, 8, 12
+Each workout has exactly ${N} movements (${letters.join(', ')}) that rotate ${R} times (${totalMins} minutes total):
+${structureLines}
 
 STRICT RULES:
 1. EQUIPMENT: Only use equipment from this list: [${equipment}]
@@ -446,10 +512,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
       "title": "Workout name",
       "tags": ["tag1", "tag2"],
       "movements": [
-        {"label": "A", "content": "specific reps + movement + weight/scale"},
-        {"label": "B", "content": "specific reps + movement"},
-        {"label": "C", "content": "specific reps + movement"},
-        {"label": "D", "content": "specific reps + movement"}
+        ${exampleMovements}
       ],
       "coaching_notes": "brief coaching cue or scaling note"
     }
@@ -467,7 +530,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
+        max_tokens: 2500,
         messages: [{ role: 'user', content: prompt }]
       })
     });
@@ -477,7 +540,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('JSONの解析に失敗しました');
     workouts = JSON.parse(jsonMatch[0]).workouts;
-    renderWorkouts(workouts);
+    renderWorkouts(workouts, N, R);
     results.style.display = 'block';
   } catch(e) {
     showError('エラー: ' + e.message);
@@ -493,55 +556,65 @@ function showError(msg) {
   el.textContent = msg;
 }
 
-const MV_CLASSES = ['mv-a', 'mv-b', 'mv-c', 'mv-d'];
-const MV_LETTERS = ['A', 'B', 'C', 'D'];
-const ROT_CLASSES = ['rot-a', 'rot-b', 'rot-c', 'rot-d'];
-const MV_MINS = [
-  ['1', '5', '9'],
-  ['2', '6', '10'],
-  ['3', '7', '11'],
-  ['4', '8', '12']
-];
+function renderWorkouts(wks, N, R) {
+  if (!N) N = Number(selections.numMovements[0]);
+  if (!R) R = Number(selections.numRounds[0]);
+  const totalMins = N * R;
+  const letters = MV_LETTERS.slice(0, N);
 
-function renderWorkouts(wks) {
+  // Compute minute labels per movement
+  const mvMins = letters.map((_, i) => {
+    const mins = [];
+    for (let r = 0; r < R; r++) mins.push(String(r * N + i + 1));
+    return mins;
+  });
+
+  // Rotation order: A B C ... N-1, A B C ... (R times)
+  const rotOrder = [];
+  for (let r = 0; r < R; r++) {
+    for (let i = 0; i < N; i++) rotOrder.push(i);
+  }
+
   const list = document.getElementById('workout-list');
   list.innerHTML = '';
-  wks.forEach((w, i) => {
+
+  wks.forEach((w, wi) => {
     const tags = (w.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
-    const movements = (w.movements || []).slice(0, 4);
+    const mvs = (w.movements || []).slice(0, N);
 
-    const movHtml = movements.map((m, mi) => `
-      <div class="movement-block ${MV_CLASSES[mi]}" data-letter="${MV_LETTERS[mi]}">
-        <div class="mv-header">
-          <span class="mv-letter">${MV_LETTERS[mi]}</span>
-          <span class="mv-mins">MIN ${MV_MINS[mi].join(' · ')}</span>
-        </div>
-        <div class="mv-content">${m.content}</div>
-      </div>
-    `).join('');
+    const movHtml = mvs.map((m, mi) => {
+      const color = MV_COLORS[mi];
+      return `
+        <div class="movement-block" data-letter="${letters[mi]}" style="border-left:3px solid ${color}">
+          <div class="mv-header">
+            <span class="mv-letter" style="color:${color}">${letters[mi]}</span>
+            <span class="mv-mins">MIN ${mvMins[mi].join(' · ')}</span>
+          </div>
+          <div class="mv-content">${m.content}</div>
+        </div>`;
+    }).join('');
 
-    // 12-block rotation bar
-    const rotOrder = [0,1,2,3,0,1,2,3,0,1,2,3];
-    const rotHtml = rotOrder.map((mi, min) => `
-      <div class="rot-block ${ROT_CLASSES[mi]}" title="Min ${min+1}: Movement ${MV_LETTERS[mi]}">${MV_LETTERS[mi]}</div>
-    `).join('');
+    const rotHtml = rotOrder.map((mi, min) => {
+      const color = MV_COLORS[mi];
+      return `<div class="rot-block" style="background:${color}18;color:${color};border-top:2px solid ${color}" title="Min ${min+1}: ${letters[mi]}">${letters[mi]}</div>`;
+    }).join('');
 
+    const numStr = wi < 9 ? `0${wi+1}` : `${wi+1}`;
     list.innerHTML += `
       <div class="workout-card">
         <div class="workout-header">
-          <div class="workout-num">0${i+1}</div>
+          <div class="workout-num">${numStr}</div>
           <div class="workout-title">${w.title}</div>
           <div class="workout-tags">${tags}</div>
         </div>
         <div class="workout-body">
-          <div class="emom-label">4 Movements × 3 Rounds = 12-EMOM</div>
+          <div class="emom-label">${N} Movements × ${R} Rounds = ${totalMins}-EMOM</div>
           <div class="movements-grid">${movHtml}</div>
-          <div class="rot-label">12-MIN ROTATION</div>
+          <div class="rot-label">${totalMins}-MIN ROTATION</div>
           <div class="rotation-bar">${rotHtml}</div>
           ${w.coaching_notes ? `<div class="workout-notes">💬 ${w.coaching_notes}</div>` : ''}
         </div>
-      </div>
-    `;
+      </div>`;
   });
 }
 </script>
