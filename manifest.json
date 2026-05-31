@@ -1,0 +1,9 @@
+{
+  "name": "EMOM Generator",
+  "short_name": "EMOMGen",
+  "description": "CrossFit 12-EMOM Workout Generator powered by Claude AI",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a"
+}

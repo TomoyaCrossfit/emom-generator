@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMOM Generator</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="EMOMGen">
+<meta name="theme-color" content="#0a0a0a">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --accent: #e8ff00;
+    --accent2: #ff4d00;
+    --text: #f0f0f0;
+    --muted: #555;
+    --card: #161616;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+  header {
+    max-width: 900px;
+    margin: 0 auto 48px;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 80px);
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: 2px;
+  }
+  .logo span { color: var(--accent2); }
+  .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    padding-bottom: 8px;
+  }
+  .main { max-width: 900px; margin: 0 auto; }
+
+  /* FORM */
+  .form-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+  .form-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+  .form-group label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 500; }
+  .full-width { grid-column: 1 / -1; }
+  textarea {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 12px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); }
+
+  /* API Config section */
+  .api-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px 32px;
+    margin-bottom: 24px;
+  }
+  .api-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .api-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    font-family: 'DM Mono', monospace;
+    line-height: 1.6;
+  }
+  .api-note a { color: var(--accent); text-decoration: none; }
+  .api-block { margin-bottom: 20px; }
+  .api-block:last-child { margin-bottom: 0; }
+  .api-block-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .input-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .input-row input, .api-input {
+    flex: 1;
+    min-width: 200px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .input-row input:focus, .api-input:focus { border-color: #fff; }
+  .input-row input::placeholder, .api-input::placeholder { color: var(--muted); }
+  .notion-cors-note {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #1a1400;
+    border: 1px solid #3a3000;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #888;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    margin-bottom: 24px;
+  }
+  .btn-primary:hover { background: #fff; }
+  .btn-primary:active { transform: scale(0.99); }
+  .btn-primary:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  /* Loading */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 48px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+  .loading.show { display: block; }
+  .loader {
+    width: 40px; height: 40px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Workouts */
+  .workouts-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .workouts-header h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+  .workout-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease forwards;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  .workout-card:nth-child(2) { animation-delay: 0.1s; }
+  .workout-card:nth-child(3) { animation-delay: 0.2s; }
+  .workout-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .workout-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--accent);
+    line-height: 1;
+    min-width: 40px;
+  }
+  .workout-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+    color: var(--text);
+  }
+  .workout-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+  }
+  .workout-body { padding: 20px; }
+  .emom-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .minutes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+  .minute-block {
+    background: var(--surface);
+    border-left: 2px solid var(--accent);
+    padding: 10px 12px;
+  }
+  .minute-block .min-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .minute-block .min-content { font-size: 13px; color: var(--text); line-height: 1.4; }
+  .workout-notes {
+    margin-top: 16px;
+    padding: 12px;
+    background: var(--surface);
+    border-left: 2px solid var(--muted);
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* Notion save */
+  .notion-save-section {
+    margin-top: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+  .notion-save-section h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .save-options { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .save-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .save-options input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; }
+  .btn-save {
+    padding: 14px 32px;
+    background: transparent;
+    color: var(--text);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    border: 1px solid var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-save:hover { background: var(--text); color: #000; }
+  .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .status-msg {
+    margin-top: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    display: none;
+  }
+  .status-msg.success { display: block; background: #0a1f00; color: #7fff00; border: 1px solid #3a5f00; }
+  .status-msg.error { display: block; background: #1f0000; color: #ff6b6b; border: 1px solid #5f0000; }
+
+  /* Error */
+  .error-box { background: #1f0000; border: 1px solid #5f0000; color: #ff6b6b; padding: 16px; font-family: 'DM Mono', monospace; font-size: 12px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="logo">EMOM<span>GEN</span></div>
+    <div class="subtitle">CrossFit 12-EMOM Workout Generator × Notion</div>
+  </div>
+</header>
+
+<div class="main">
+  <!-- Form -->
+  <div class="form-section">
+    <h2>01 — ワークアウト条件</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>ターゲット部位</label>
+        <div class="chip-group" id="chips-target">
+          <button class="chip" data-group="target" data-val="Full Body">Full Body</button>
+          <button class="chip" data-group="target" data-val="Upper Body">Upper Body</button>
+          <button class="chip" data-group="target" data-val="Lower Body">Lower Body</button>
+          <button class="chip" data-group="target" data-val="Core">Core</button>
+          <button class="chip" data-group="target" data-val="Posterior Chain">Posterior</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>強度レベル</label>
+        <div class="chip-group" id="chips-level">
+          <button class="chip" data-group="level" data-val="Beginner">初級</button>
+          <button class="chip active" data-group="level" data-val="Intermediate">中級</button>
+          <button class="chip" data-group="level" data-val="Advanced">上級</button>
+          <button class="chip" data-group="level" data-val="RX">RX+</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>使用器具</label>
+        <div class="chip-group" id="chips-equipment">
+          <button class="chip active" data-group="equipment" data-val="Barbell">バーベル</button>
+          <button class="chip" data-group="equipment" data-val="Kettlebell">ケトルベル</button>
+          <button class="chip active" data-group="equipment" data-val="Dumbbells">ダンベル</button>
+          <button class="chip" data-group="equipment" data-val="Pull-up Bar">懸垂台</button>
+          <button class="chip" data-group="equipment" data-val="Box">ボックス</button>
+          <button class="chip" data-group="equipment" data-val="Bodyweight Only">器具なし</button>
+          <button class="chip" data-group="equipment" data-val="Rings">リング</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>フォーカス</label>
+        <div class="chip-group" id="chips-focus">
+          <button class="chip" data-group="focus" data-val="Strength">筋力</button>
+          <button class="chip active" data-group="focus" data-val="Cardio">心肺</button>
+          <button class="chip" data-group="focus" data-val="Skill">スキル</button>
+          <button class="chip" data-group="focus" data-val="MetCon">メトコン</button>
+          <button class="chip" data-group="focus" data-val="Olympic Lifting">五輪挙</button>
+          <button class="chip" data-group="focus" data-val="Gymnastics">体操</button>
+        </div>
+      </div>
+      <div class="form-group full-width">
+        <label>追加メモ（任意）</label>
+        <textarea id="extra-notes" placeholder="例：週2回のプログラム向け、肩の怪我に配慮、など"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Config -->
+  <div class="api-section">
+    <h2>02 — API 設定</h2>
+    <div class="api-note">
+      APIキーはブラウザのローカルストレージにのみ保存されます。
+    </div>
+
+    <div class="api-block">
+      <div class="api-block-label">Anthropic API Key（ワークアウト生成に必要）</div>
+      <input type="password" id="anthropic-key" class="api-input" placeholder="sk-ant-...">
+    </div>
+
+    <div class="api-block">
+      <div class="api-block-label">Notion 設定（任意 — 保存機能）</div>
+      <div class="input-row">
+        <input type="password" id="notion-key" placeholder="Notion API Key: secret_xxxxxxxxxxxx">
+        <input type="text" id="notion-db" placeholder="Database ID: xxxxxxxx-xxxx-xxxx-...">
+      </div>
+      <div class="notion-cors-note">
+        ⚠ Notion保存はCORSの制限によりブラウザから直接動作しません。Notion公式アプリへのコピーペーストをご利用ください。
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate Button -->
+  <button class="btn-primary" id="gen-btn" onclick="generate()">
+    ⚡ 12-EMOM ワークアウトを生成する
+  </button>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="loader"></div>
+    <div>GENERATING WORKOUTS...</div>
+  </div>
+
+  <!-- Error -->
+  <div class="error-box" id="error-box" style="display:none"></div>
+
+  <!-- Results -->
+  <div id="results" style="display:none">
+    <div class="workouts-header">
+      <h2>生成されたワークアウト</h2>
+    </div>
+    <div id="workout-list"></div>
+
+    <!-- Save to Notion -->
+    <div class="notion-save-section" id="save-section">
+      <h3>Notion へ保存</h3>
+      <div class="save-options" id="save-options"></div>
+      <button class="btn-save" id="save-btn" onclick="saveToNotion()">Notionに保存する</button>
+      <div class="status-msg" id="status-msg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const selections = { target: [], level: ['Intermediate'], equipment: ['Barbell','Dumbbells'], focus: ['Cardio'] };
+let workouts = [];
+
+// Restore saved API keys
+window.addEventListener('load', () => {
+  const ak = localStorage.getItem('emom_anthropic_key');
+  const nk = localStorage.getItem('emom_notion_key');
+  const nd = localStorage.getItem('emom_notion_db');
+  if (ak) document.getElementById('anthropic-key').value = ak;
+  if (nk) document.getElementById('notion-key').value = nk;
+  if (nd) document.getElementById('notion-db').value = nd;
+});
+
+// Chip toggle
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const group = chip.dataset.group;
+    const val = chip.dataset.val;
+    const single = group === 'level';
+    if (single) {
+      document.querySelectorAll(`[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
+      selections[group] = [val];
+      chip.classList.add('active');
+    } else {
+      if (chip.classList.contains('active')) {
+        chip.classList.remove('active');
+        selections[group] = selections[group].filter(v => v !== val);
+      } else {
+        chip.classList.add('active');
+        selections[group].push(val);
+      }
+    }
+  });
+});
+
+async function generate() {
+  const anthropicKey = document.getElementById('anthropic-key').value.trim();
+  if (!anthropicKey) {
+    document.getElementById('error-box').style.display = 'block';
+    document.getElementById('error-box').textContent = 'Anthropic APIキーを入力してください（02 — API設定）';
+    return;
+  }
+  localStorage.setItem('emom_anthropic_key', anthropicKey);
+
+  const btn = document.getElementById('gen-btn');
+  const loading = document.getElementById('loading');
+  const results = document.getElementById('results');
+  const errorBox = document.getElementById('error-box');
+
+  btn.disabled = true;
+  loading.classList.add('show');
+  results.style.display = 'none';
+  errorBox.style.display = 'none';
+
+  const notes = document.getElementById('extra-notes').value;
+  const prompt = `You are an expert CrossFit programmer. Generate exactly 3 distinct 12-minute EMOM (Every Minute On the Minute) workouts based on:
+
+- Target: ${selections.target.join(', ') || 'Any'}
+- Level: ${selections.level.join(', ')}
+- Equipment: ${selections.equipment.join(', ') || 'Any'}
+- Focus: ${selections.focus.join(', ')}
+- Notes: ${notes || 'None'}
+
+IMPORTANT: Respond ONLY with valid JSON, no markdown, no explanation, no backticks.
+
+Format:
+{
+  "workouts": [
+    {
+      "title": "Workout name",
+      "tags": ["tag1", "tag2"],
+      "minutes": [
+        {"label": "Min 1", "content": "exercise description"},
+        ... (12 entries total, labeled Min 1 through Min 12)
+      ],
+      "coaching_notes": "brief coaching cue or scaling note"
+    }
+  ]
+}
+
+Make each workout creative, varied, and appropriate for the selected level. Each minute should have specific reps and movements.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || `HTTPエラー: ${res.status}`);
+    const text = data.content.map(b => b.text || '').join('');
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('JSONの解析に失敗しました');
+    const parsed = JSON.parse(jsonMatch[0]);
+    workouts = parsed.workouts;
+    renderWorkouts(workouts);
+    results.style.display = 'block';
+    renderSaveOptions(workouts);
+  } catch(e) {
+    errorBox.style.display = 'block';
+    errorBox.textContent = 'エラー: ' + e.message;
+  }
+
+  btn.disabled = false;
+  loading.classList.remove('show');
+}
+
+function renderWorkouts(wks) {
+  const list = document.getElementById('workout-list');
+  list.innerHTML = '';
+  wks.forEach((w, i) => {
+    const tags = (w.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
+    const minutes = (w.minutes || []).map(m => `
+      <div class="minute-block">
+        <div class="min-label">${m.label}</div>
+        <div class="min-content">${m.content}</div>
+      </div>
+    `).join('');
+    list.innerHTML += `
+      <div class="workout-card">
+        <div class="workout-header">
+          <div class="workout-num">0${i+1}</div>
+          <div class="workout-title">${w.title}</div>
+          <div class="workout-tags">${tags}</div>
+        </div>
+        <div class="workout-body">
+          <div class="emom-label">12-EMOM — Every Minute On the Minute</div>
+          <div class="minutes-grid">${minutes}</div>
+          ${w.coaching_notes ? `<div class="workout-notes">💬 ${w.coaching_notes}</div>` : ''}
+        </div>
+      </div>
+    `;
+  });
+}
+
+function renderSaveOptions(wks) {
+  const opts = document.getElementById('save-options');
+  opts.innerHTML = wks.map((w, i) => `
+    <label>
+      <input type="checkbox" class="save-check" value="${i}" checked>
+      ${w.title}
+    </label>
+  `).join('');
+}
+
+async function saveToNotion() {
+  const apiKey = document.getElementById('notion-key').value.trim();
+  const dbId = document.getElementById('notion-db').value.trim();
+  const statusMsg = document.getElementById('status-msg');
+
+  if (!apiKey || !dbId) {
+    statusMsg.className = 'status-msg error';
+    statusMsg.textContent = 'APIキーとデータベースIDを入力してください';
+    return;
+  }
+  localStorage.setItem('emom_notion_key', apiKey);
+  localStorage.setItem('emom_notion_db', dbId);
+
+  const checked = [...document.querySelectorAll('.save-check:checked')].map(c => parseInt(c.value));
+  if (!checked.length) {
+    statusMsg.className = 'status-msg error';
+    statusMsg.textContent = '保存するワークアウトを選択してください';
+    return;
+  }
+
+  const saveBtn = document.getElementById('save-btn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = '保存中...';
+  statusMsg.style.display = 'none';
+
+  let saved = 0, failed = 0;
+  for (const idx of checked) {
+    const w = workouts[idx];
+    try {
+      const res = await fetch('https://api.notion.com/v1/pages', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify({
+          parent: { database_id: dbId },
+          properties: { title: { title: [{ text: { content: w.title } }] } },
+          children: buildNotionContent(w)
+        })
+      });
+      if (res.ok) saved++; else { await res.json(); failed++; }
+    } catch(e) { failed++; }
+  }
+
+  saveBtn.disabled = false;
+  saveBtn.textContent = 'Notionに保存する';
+
+  if (saved > 0 && failed === 0) {
+    statusMsg.className = 'status-msg success';
+    statusMsg.textContent = `✓ ${saved}件のワークアウトをNotionに保存しました`;
+  } else {
+    statusMsg.className = 'status-msg error';
+    statusMsg.textContent = `保存失敗。NotionはCORSの制限でブラウザから直接呼び出せません。`;
+  }
+}
+
+function buildNotionContent(w) {
+  const blocks = [];
+  blocks.push({
+    object: 'block', type: 'callout',
+    callout: { icon: { emoji: '⚡' }, color: 'yellow_background', rich_text: [{ text: { content: `12-EMOM | Tags: ${(w.tags||[]).join(', ')}` } }] }
+  });
+  blocks.push({ object: 'block', type: 'heading_2', heading_2: { rich_text: [{ text: { content: 'EMOM Structure' } }] } });
+  (w.minutes || []).forEach(m => {
+    blocks.push({
+      object: 'block', type: 'bulleted_list_item',
+      bulleted_list_item: { rich_text: [{ text: { content: `${m.label}: ` }, annotations: { bold: true } }, { text: { content: m.content } }] }
+    });
+  });
+  if (w.coaching_notes) {
+    blocks.push({ object: 'block', type: 'heading_2', heading_2: { rich_text: [{ text: { content: 'Coaching Notes' } }] } });
+    blocks.push({ object: 'block', type: 'quote', quote: { rich_text: [{ text: { content: w.coaching_notes } }] } });
+  }
+  return blocks;
+}
+</script>
+</body>
+</html>
